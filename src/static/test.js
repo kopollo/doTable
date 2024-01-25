@@ -2,17 +2,17 @@ let table = document.getElementById("table")
 let rowLength = table.rows.length;
 
 function getData() {
-    let res = []
+    let res = {"records": []}
 
     for (let i = 1; i < rowLength; i++) {
         let oCells = table.rows.item(i).cells;
         let cellLength = oCells.length;
         let record = {
-            name: oCells.item(0).innerHTML,
-            deed: oCells.item(1).innerHTML,
+            title: oCells.item(0).innerHTML,
+            done: oCells.item(1).innerHTML,
             time: oCells.item(2).innerHTML,
         }
-        res.push(record)
+        res["records"].push(record)
     }
     return res;
     // return JSON.stringify(res);
@@ -24,7 +24,7 @@ function sendData() {
     XHR.setRequestHeader('content-type', 'application/json');
     XHR.send(JSON.stringify(getData()));
 }
-// setInterval(() => {
-//     sendData()
-// }, 2000)
+setInterval(() => {
+    sendData()
+}, 2000)
 

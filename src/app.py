@@ -1,8 +1,17 @@
+import json
+
+from pydantic import BaseModel
+
+import db
 from flask import Flask, render_template, request, jsonify
+
+# from cli import cli_bp
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "sdddsdsd"
 
+# app.register_blueprint()
+app.config.from_pyfile()
 data1 = [
     ['title', 'what have done', 'time'],
     ['cf', '- write two cycles in day', '30m'],
@@ -18,7 +27,7 @@ data2 = [
 
 @app.route("/")
 def index():
-    return render_template("index.html", table1=data1, table2=data2)
+    return render_template("index.html", table1=data1)
 
 
 @app.route("/account/<username>", methods=["POST", "GET"])
@@ -28,13 +37,23 @@ def account(username: str):
     return render_template("account.html", username=username)
 
 
+class DayTable(BaseModel):
+    title: str
+    done: str
+    time: str
+
+
 @app.route('/process', methods=['POST'])
 def process():
     data = request.get_json()  # retrieve the data sent from JavaScript
-    print(data)
+    # print()
+    for line in data['records']:
+        # print(json.dumps(line))
+        t = DayTable.model_validate(line)
+        db.add(t.model_dump())
+        # print(t)
+
     return ""
-    # process the data using Python code
-    # result = data['value'] * 2
     # return jsonify(result=result)
 
 
