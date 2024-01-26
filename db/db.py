@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import scoped_session, sessionmaker, DeclarativeMeta
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -10,6 +10,7 @@ db_session = scoped_session(sessionmaker(autocommit=False,
                                          bind=engine))
 base: DeclarativeMeta = declarative_base()
 base.query = db_session.query_property()  # whast is it?
+from .models.dayTable import DayTableModel
 
 
 def create_db():
@@ -19,8 +20,19 @@ def create_db():
     db_session.commit()
 
 
-def add(data: dict):
+def add_table(data: dict):
     from .models.dayTable import DayTableModel
     t = DayTableModel(**data)
-    db_session.add(t)
+    db_session.merge(t)
     db_session.commit()
+
+
+def get_user_table(user_id: int) -> list[DayTableModel]:
+    data: list[DayTableModel] = db_session.query(DayTableModel).filter(DayTableModel.user_id == user_id)
+    # for i in data:
+    #     print(i.user_id)
+    # for table in result.scalars():
+    #     print(f"{table.title} xxxxxx")
+    # # data = result.scalars().all()
+    # print(result.scalars())
+    return data

@@ -8,6 +8,9 @@ function getData() {
         let oCells = table.rows.item(i).cells;
         let cellLength = oCells.length;
         let record = {
+            row: i,
+            table_number: 1,
+            user_id: 1,
             title: oCells.item(0).innerHTML,
             done: oCells.item(1).innerHTML,
             time: oCells.item(2).innerHTML,
