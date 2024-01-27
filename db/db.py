@@ -20,19 +20,19 @@ def create_db():
     db_session.commit()
 
 
-def add_table(data: dict):
-    from .models.dayTable import DayTableModel
-    t = DayTableModel(**data)
-    db_session.merge(t)
-    db_session.commit()
+# def add_table(data: dict):
+#     from .models.dayTable import DayTableModel
+#     t = DayTableModel(**data)
+#     db_session.merge(t)
+#     db_session.commit()
 
 
-def get_user_table(user_id: int) -> list[DayTableModel]:
-    data: list[DayTableModel] = db_session.query(DayTableModel).filter(DayTableModel.user_id == user_id)
-    # for i in data:
-    #     print(i.user_id)
-    # for table in result.scalars():
-    #     print(f"{table.title} xxxxxx")
-    # # data = result.scalars().all()
-    # print(result.scalars())
-    return data
+# def get_user_table(user_id: int) -> list[DayTableModel]:
+#     data: list[DayTableModel] = db_session.query(DayTableModel).filter(DayTableModel.user_id == user_id)
+#     # for i in data:
+#     #     print(i.user_id)
+#     # for table in result.scalars():
+#     #     print(f"{table.title} xxxxxx")
+#     # # data = result.scalars().all()
+#     # print(result.scalars())
+#     return data

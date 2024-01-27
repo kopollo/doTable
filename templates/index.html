@@ -9,13 +9,13 @@
             {% for record in table%}
             <tr>
                 {% if loop.first %}
-                {% for i in record%}
-                <th> {{i}}</th>
-                {%endfor%}
+                    {% for i in record%}
+                        <th> {{i}}</th>
+                    {%endfor%}
                 {% else %}
-                {% for i in record%}
-                <td contenteditable> {{i}}</td>
-                {%endfor%}
+                    {% for i in record%}
+                        <td contenteditable> {{i}}</td>
+                    {%endfor%}
                 {% endif%}
             </tr>
             {%endfor%}

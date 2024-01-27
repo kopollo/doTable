@@ -3,8 +3,6 @@ from flask import Flask, render_template, request
 
 from cli import cli_bp
 from routes import routes_bp
-from models_pydantic import DayTable
-import db.db as db
 
 app = Flask(__name__)
 app.register_blueprint(cli_bp)

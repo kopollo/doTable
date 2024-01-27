@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class DayTable(BaseModel):
+class DayTableDTO(BaseModel):
     title: str
     done: str
     time: str
