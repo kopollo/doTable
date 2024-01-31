@@ -12,5 +12,6 @@ class DayTableRepository:
 
     @staticmethod
     def get_all_records(user_id: int) -> list[DayTableDTO]:
-        data: list[DayTableModel] = db_session.query(DayTableModel).filter(DayTableModel.user_id == user_id)
+        data: list[DayTableModel] = db_session.query(DayTableModel) \
+            .filter(DayTableModel.user_id == user_id)
         return list(map(DayTableMapper.to_dto, data))

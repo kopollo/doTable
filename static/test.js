@@ -1,79 +1,156 @@
-let table = document.getElementById("table")
-let rowLength = table.rows.length;
-
-function getData() {
-    let res = {"records": []}
-
-    for (let i = 1; i < rowLength; i++) {
-        let oCells = table.rows.item(i).cells;
-        let cellLength = oCells.length;
-        let record = {
-            row: i,
-            table_number: 1,
-            user_id: 1,
-            title: oCells.item(0).innerHTML,
-            done: oCells.item(1).innerHTML,
-            time: oCells.item(2).innerHTML
-        }
-        res["records"].push(record)
-    }
-    return res;
-    // return JSON.stringify(res);
-}
-
-function sendData() {
-    let XHR = new XMLHttpRequest();
-    XHR.open('POST', 'process');
-    XHR.setRequestHeader('content-type', 'application/json');
-    XHR.send(JSON.stringify(getData()));
-}
-
-
-async function get_data_from_db() {
+async function get_row_data_from_db(user_id) {
     try {
-        // GET
-        const res = await fetch(`/tables/1`)
-
-        // PARSE DATA
-        let data = await res.json()
-        // console.log(data["records"])
-        return data
-        // console.log(data)
+        const res = await fetch(`/tables?user_id=${user_id}`)
+        return await res.json()
     } catch (err) {
     }
 }
 
-async function addElement() {
+class Table {
+    constructor(json) {
+        this.table_id = 0
+        this.user_id = 0
+        this.records = this.fromJson(json)
+    }
 
-    const newDiv = document.createElement("div",);
-    newDiv.className = "tb"
-    const newContent = document.createElement("table");
-    let data = [
-        ['title', 'what have done', 'time'],
-    ]
-    let response = await get_data_from_db()
-    for (let i = 0; i < response["records"][0].length; i++) {
-        let record = response["records"][0][i]
-        data.push([record["title"], record["done"], record["time"]])
-    }
-    for (let i = 0; i < data.length; i++) {
-        let record = document.createElement("tr")
-        for (let j = 0; j < 3; j++) {
-            let val = document.createElement("td")
-            if (i === 0) {
-                val = document.createElement("th")
-            }
-            val.innerHTML = data[i][j]
-            record.appendChild(val)
+    gen() {
+        const table = document.createElement("div");
+        table.className = "tb"
+        const newContent = document.createElement("table");
+        let header = new DayTableView(new DayTableDTO('title', 'what have done', 'time'))
+        header.tag = "th"
+        header.contentable = false
+        newContent.appendChild(header.toHtmlView())
+
+        for (let i = 0; i < this.records.length; i++) {
+            // let record = new Record(this.records[i].title, this.records[i].done, this.records[i].time, i)
+            let view = new DayTableView(this.records[i]).toHtmlView()
+            newContent.appendChild(view)
         }
-        newContent.appendChild(record)
+        table.appendChild(newContent);
+
+        table.addEventListener("click", (event) => {
+            this.sendData()
+        });
+        return table
     }
-    newDiv.appendChild(newContent);
-    document.getElementById("tables").appendChild(newDiv)
+
+    fromJson(json) {
+        let records = []
+        // console.log(this.table_id)
+        for (let i = 0; i < json["records"][0].length; i++) {
+            let record = json["records"][0][i]
+            // this.user_id = record["user_id"]
+            // this.table_id = record["table_number"]
+            let dto = new DayTableDTO(
+                record["title"],
+                record["done"],
+                record["time"],
+                record["user_id"],
+                record["row"],
+                record["table_number"]
+            )
+            records.push(dto)
+        }
+        console.log(records)
+        return records
+    }
+
+    toJson() {
+        let res = {"records": []}
+        for (let record of this.records) {
+            res["records"].push({
+                row: record.row,
+                table_number: record.table_number,
+                user_id: record.user_id,
+                title: record.title,
+                done: record.done,
+                time: record.time,
+            })
+        }
+        return JSON.stringify(res)
+    }
+
+    sendData() {
+        let XHR = new XMLHttpRequest();
+        XHR.open('POST', 'process');
+        XHR.setRequestHeader('content-type', 'application/json');
+        XHR.send(this.toJson())
+    }
 }
 
-addElement()
+class DayTableDTO {
+    constructor(title, done, time, user_id, row, table_number) {
+        this.title = title
+        this.done = done
+        this.time = time
+        this.user_id = user_id
+        this.row = row
+        this.table_number = table_number
+    }
+}
 
+class DayTableView {
+    constructor(dto) {
+        this.dto = dto
+        this.tag = "td"
+        this.contentable = true
+    }
+
+    addTitle() {
+        let v = document.createElement(this.tag)
+        v.textContent = this.dto.title
+        v.contentEditable = this.contentable
+        v.addEventListener("input", (event) => {
+            this.dto.title = v.textContent
+        });
+        return v;
+    }
+
+    addDone() {
+        let v = document.createElement(this.tag)
+        v.textContent = this.dto.done
+        v.contentEditable = this.contentable
+        v.addEventListener("input", (event) => {
+            this.dto.done = v.textContent
+        });
+        return v;
+    }
+
+    addTime() {
+        let v = document.createElement(this.tag)
+        v.textContent = this.dto.time
+        v.contentEditable = this.contentable
+        v.addEventListener("input", (event) => {
+            this.dto.time = v.textContent
+        });
+        return v;
+    }
+
+    toHtmlView() {
+        let record = document.createElement("tr")
+        record.appendChild(this.addTitle())
+        record.appendChild(this.addDone())
+        record.appendChild(this.addTime())
+        return record
+    }
+}
+
+
+async function addElement(user_id) {
+    let response_json = await get_row_data_from_db(user_id)
+    let table = new Table(response_json)
+    document.getElementById("tables").appendChild(table.gen())
+    // setInterval(() => {
+    //     table.sendData()
+    // }, 2000)
+}
+
+// await get_row_data_from_db(1, 1)
+// console.log(d)
+//
+addElement(1)
+// addElement(1, 2)
 // setInterval(() => {
 //     sendData()
 // }, 2000)

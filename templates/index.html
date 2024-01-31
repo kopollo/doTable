@@ -4,25 +4,5 @@
 <h1> CATTTTTTTTTTT </h1>
 <p> ITS IMPORTANT TOI HIDE BT</p>
 <div class="row" id="tables">
-    <div class="tb">
-        <table id="table">
-            {% for record in table%}
-            <tr>
-                {% if loop.first %}
-                    {% for i in record%}
-                        <th> {{i}}</th>
-                    {%endfor%}
-                {% else %}
-                    {% for i in record%}
-                        <td contenteditable> {{i}}</td>
-                    {%endfor%}
-                {% endif%}
-            </tr>
-            {%endfor%}
-        </table>
-    </div>
 </div>
-<!--<div id="tb2">-->
-<!--</div>-->
-
 {% endblock %}

@@ -1,31 +1,27 @@
-from flask import Blueprint, render_template, jsonify
-from flask import Flask, render_template, request
+from flask import Blueprint, jsonify, render_template, request, url_for
 
 from dto import DayTableDTO
 from db.repositories import DayTableRepository
-from pydantic import json
 
 routes_bp = Blueprint("routes", __name__)
 
-data1 = [
-    ['title', 'what have done', 'time'],
-    ['cf', '- write two cycles in day', '30m'],
-    ['doTable', '- test input data', '1h'],
-]
+# data1 = [
+#     ['title', 'what have done', 'time'],
+#     ['cf', '- write two cycles in day', '30m'],
+#     ['doTable', '- test input data', '1h'],
+# ]
 
 headers = ['title', 'what have done', 'time']
 
 
 @routes_bp.route("/")
 def index():
-    to_send = [headers]
-    for line in DayTableRepository.get_all_records(1):
-        to_send.append([line.title, line.done, line.time])
-    return render_template("index.html", table=to_send)
+    return render_template("index.html")
 
 
-@routes_bp.route("/tables/<user_id>")
-def get_tables(user_id: int):
+@routes_bp.route("/tables")
+def get_tables():
+    user_id = request.args.get('user_id', type=int)
     data = DayTableRepository.get_all_records(user_id)
     response = {
         "records": []
@@ -44,8 +40,8 @@ def get_tables(user_id: int):
 @routes_bp.route('/process', methods=['POST'])
 def process():
     data = request.get_json()  # retrieve the data sent from JavaScript
-    for line in data['records']:
-        t = DayTableDTO.model_validate(line)
+    for record in data['records']:
+        t = DayTableDTO.model_validate(record)
         DayTableRepository.add(t)
 
     return ""
